@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Image Training</title>
+  <script src="https://libs.zappar.com/zappar-imagetraining/4.0.5/zappar-imagetraining.js"></script>
+</head>
+<body>
+  <input type="file" id="inputImage" accept=".png, .jpg, .jpeg" onchange="previewAndTrainImage(event)">
+  <br/>
+  <img id="preview" width="200">
+  <br/>
+  <div id="spinner" style="display: none;">Processing... Please wait.</div>
+  <br/>
+  <a id="download" style="display: none;">Download</a>
+
+  <script>
+    async function previewAndTrainImage(event) {
+      const img = document.getElementById('preview');
+      img.src = URL.createObjectURL(event.target.files[0]);
+      img.onload = async function() {
+        document.getElementById('spinner').style.display = 'block';
+        const response = await fetch(img.src);
+        const buffer = await response.arrayBuffer();
+        const options = {};
+
+
+        const target = await ZapparImageTraining.train(buffer, options);
+        document.getElementById('spinner').style.display = 'none';
+        const download = document.getElementById('download');
+        download.href = URL.createObjectURL(new Blob([target], { type: "application/octet-stream" }));
+        download.download = "target.zpt";
+        download.style.display = 'block';
+      }
+    }
+  </script>
+</body>
+</html>
